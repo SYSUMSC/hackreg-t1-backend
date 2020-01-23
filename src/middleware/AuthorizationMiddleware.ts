@@ -6,7 +6,7 @@ import IUserToken from '../user/IUserToken';
 import UserModel from '../user/UserModel';
 
 function getAuthMiddleware(publicKey: Buffer) {
-    return function authorizationMiddleware(request: express.Request & { user: IUser}, response: express.Response, next: NextFunction) {
+    return function authorizationMiddleware(request: express.Request & { user: IUser }, response: express.Response, next: NextFunction) {
         const cookies = request.cookies;
         if (!cookies || !cookies.Authorization) {
             next(createHttpError(403, '需要登录才能进行操作'));

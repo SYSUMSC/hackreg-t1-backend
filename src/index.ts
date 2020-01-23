@@ -1,6 +1,7 @@
-import dotenv from 'dotenv';
 import commandLineArgs from 'command-line-args';
-import { cleanEnv, str, port } from 'envalid';
+import dotenv from 'dotenv';
+import { cleanEnv, port, str } from 'envalid';
+import fs from 'fs-extra';
 import App from './App';
 
 const options = commandLineArgs([
@@ -18,9 +19,20 @@ if (error) {
     throw error;
 }
 cleanEnv(process.env, {
+    // TODO: add 'test' later
     NODE_ENV: str({ choices: ['development', 'production'] }),
+    HOST: str(),
     PORT: port(),
+    MONGODB: str(),
+    PUBKEY: str(),
+    PRIKEY: str(),
 });
 
-const app = new App();
-app.launch();
+const app = new App({
+    host: process.env.HOST!,
+    port: Number(process.env.PORT!),
+    mongodb: process.env.MONGODB!,
+    publicKey: fs.readFileSync(process.env.PUBKEY!),
+    privateKey: fs.readFileSync(process.env.PRIKEY!),
+});
+app.init();

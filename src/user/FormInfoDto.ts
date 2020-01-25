@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsEmail, IsInstance, IsString, Length, Validate, ValidateNested } from 'class-validator';
+import { IsArray, IsEmail, IsInstance, IsString, Length, Validate, ValidateNested, ArrayMinSize, ArrayMaxSize } from 'class-validator';
 import 'reflect-metadata';
 import CaptainUniquenessValidator from './CaptainUniquenessValidator';
 import MemberInfoDto from './MemberInfoDto';
@@ -14,6 +14,8 @@ class FormInfoDto {
     public teamDescription!: string;
 
     @IsArray()
+    @ArrayMinSize(2)
+    @ArrayMaxSize(6)
     @IsInstance(MemberInfoDto, { each: true })
     @Type(() => MemberInfoDto)
     @ValidateNested()

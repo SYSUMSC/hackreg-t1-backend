@@ -6,7 +6,7 @@ interface IUser {
     form: {
         teamName: string,
         teamDescription: string,
-        memberInfo: [] | [{
+        memberInfo: Array<{
             name: string,
             gender: number,
             captain: boolean,
@@ -18,7 +18,7 @@ interface IUser {
             grade: string,
             profession: string,
             experience: string,
-        }];
+        }>;
     };
 }
 

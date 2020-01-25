@@ -6,7 +6,7 @@ import createHttpError from 'http-errors';
 import mongoose, { ConnectionOptions } from 'mongoose';
 import AuthController from './controller/AuthController';
 import IController from './controller/IController';
-import SignupController from './controller/SignupFormController';
+import SignupController from './controller/SignupController';
 import unhandledErrorsBackup from './middleware/UnhandledErrorsBackup';
 import { logger } from './shared/Logger';
 
@@ -22,6 +22,7 @@ const MONGO_OPTIONS: ConnectionOptions = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     autoIndex: false,
+    useFindAndModify: false,
 };
 
 const JSON_OPTIONS: OptionsJson = {
@@ -43,8 +44,8 @@ class App {
         this.app = express();
         this.config = config;
         this.controllers = [
-            new SignupController(),
-            new AuthController(),
+            new SignupController(this.config.publicKey),
+            new AuthController(this.config.privateKey),
         ];
     }
 
@@ -58,7 +59,11 @@ class App {
         this.controllers.forEach((controller) => {
             this.app.use('/', controller.router);
         });
-        this.app.all(`*`, (_, __, next) => next(createHttpError(400, '请求的方法或路径无效')));
+        this.app.all(`*`, (request, _, next) => {
+            if (!request.route) {
+                next(createHttpError(400, '请求的方法或路径无效'));
+            }
+        });
     }
 
     private initErrorHandlers() {

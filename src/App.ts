@@ -2,6 +2,7 @@ import { OptionsJson, OptionsUrlencoded } from 'body-parser';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import { Application } from 'express';
+import helmet from 'helmet';
 import createHttpError from 'http-errors';
 import mongoose, { ConnectionOptions } from 'mongoose';
 import AuthController from './controller/AuthController';
@@ -11,6 +12,7 @@ import unhandledErrorsBackup from './middleware/UnhandledErrorsBackup';
 import { logger } from './shared/Logger';
 
 interface IAppConfig {
+    trustProxy: string;
     host: string;
     port: number;
     mongodb: string;
@@ -47,9 +49,11 @@ class App {
             new SignupController(this.config.publicKey),
             new AuthController(this.config.privateKey),
         ];
+        this.app.set('trust proxy', this.config.trustProxy);
     }
 
     private initMiddlewares() {
+        this.app.use(helmet({ noCache: true }));
         this.app.use(express.json(JSON_OPTIONS));
         this.app.use(express.urlencoded(URLENCODED_OPTIONS));
         this.app.use(cookieParser());

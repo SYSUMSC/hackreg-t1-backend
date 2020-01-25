@@ -21,6 +21,7 @@ if (error) {
 cleanEnv(process.env, {
     // TODO: add 'test' later
     NODE_ENV: str({ choices: ['development', 'production'] }),
+    TRUST_PROXY: str(),
     HOST: str(),
     PORT: port(),
     MONGODB: str(),
@@ -29,6 +30,7 @@ cleanEnv(process.env, {
 });
 
 const app = new App({
+    trustProxy: process.env.TRUST_PROXY!,
     host: process.env.HOST!,
     port: Number(process.env.PORT!),
     mongodb: process.env.MONGODB!,

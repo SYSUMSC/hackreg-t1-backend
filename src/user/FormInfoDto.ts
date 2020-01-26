@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsEmail, IsInstance, IsString, Length, Validate, ValidateNested, ArrayMinSize, ArrayMaxSize } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsEmail, IsInstance, IsString, Length, Validate, ValidateNested } from 'class-validator';
 import 'reflect-metadata';
 import CaptainUniquenessValidator from './CaptainUniquenessValidator';
 import MemberInfoDto from './MemberInfoDto';

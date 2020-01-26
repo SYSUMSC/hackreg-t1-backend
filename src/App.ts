@@ -5,9 +5,11 @@ import { Application } from 'express';
 import helmet from 'helmet';
 import createHttpError from 'http-errors';
 import mongoose, { ConnectionOptions } from 'mongoose';
-import AuthController from './controller/AuthController';
+import morgan from 'morgan';
+import AuthController, { IAuthControllerConfig } from './controller/AuthController';
 import IController from './controller/IController';
 import SignupController from './controller/SignupController';
+import SubmitController, { ISubmitControllerConfig } from './controller/SubmitController';
 import unhandledErrorsBackup from './middleware/UnhandledErrorsBackup';
 import { logger } from './shared/Logger';
 
@@ -18,6 +20,8 @@ interface IAppConfig {
     mongodb: string;
     privateKey: Buffer;
     publicKey: Buffer;
+    authControllerConfig: IAuthControllerConfig;
+    submitControllerConfig: ISubmitControllerConfig;
 }
 
 const MONGO_OPTIONS: ConnectionOptions = {
@@ -47,12 +51,14 @@ class App {
         this.config = config;
         this.controllers = [
             new SignupController(this.config.publicKey),
-            new AuthController(this.config.privateKey),
+            new AuthController(this.config.authControllerConfig),
+            new SubmitController(this.config.submitControllerConfig),
         ];
         this.app.set('trust proxy', this.config.trustProxy);
     }
 
     private initMiddlewares() {
+        this.app.use(morgan('combined'));
         this.app.use(helmet({ noCache: true }));
         this.app.use(express.json(JSON_OPTIONS));
         this.app.use(express.urlencoded(URLENCODED_OPTIONS));

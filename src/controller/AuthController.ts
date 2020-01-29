@@ -44,6 +44,7 @@ class AuthController implements IController {
     private initRoutes() {
         this.router.post(`${this.path}/register`, getValidationMiddleware(UserRegAndLoginDto), withUnhandledErrorBackup(this.register));
         this.router.post(`${this.path}/login`, getValidationMiddleware(UserRegAndLoginDto), withUnhandledErrorBackup(this.login));
+        this.router.post(`${this.path}/logout`, withUnhandledErrorBackup(this.logout));
         this.router.post(`${this.path}/reset`, getValidationMiddleware(PasswordResetDto), withUnhandledErrorBackup(this.reset));
         this.router.post(`${this.path}/confirm`, getValidationMiddleware(PasswordResetConfirmDto), withUnhandledErrorBackup(this.confirm));
     }
@@ -65,7 +66,8 @@ class AuthController implements IController {
                 },
             });
             await user.save();
-            response.setHeader('Set-Cookie', [this.createLoginCookie(user)]);
+            const token = jwt.sign({ _id: user!._id }, this.config.privateKey, { expiresIn: '12h', algorithm: 'RS256' });
+            response.cookie('Authorization', token, { maxAge: 43200000, httpOnly: true });
             response.status(201).json({});
         }
     }
@@ -77,15 +79,15 @@ class AuthController implements IController {
         if (!matching) {
             next(createHttpError(422, '指定的邮箱或密码不正确'));
         } else {
-            response.setHeader('Set-Cookie', [this.createLoginCookie(user!)]);
+            const token = jwt.sign({ _id: user!._id }, this.config.privateKey, { expiresIn: '12h', algorithm: 'RS256' });
+            response.cookie('Authorization', token, { maxAge: 43200000, httpOnly: true });
             response.status(200).json({});
         }
     }
 
-    private createLoginCookie(user: IUser) {
-        const expiresIn = 60 * 60; // an hour
-        const token = jwt.sign({ _id: user._id }, this.config.privateKey, { expiresIn, algorithm: 'RS256' });
-        return `Authorization=${token}; HttpOnly; Max-Age=${expiresIn}`;
+    private logout = async (request: express.Request, response: express.Response, next: NextFunction) => {
+        response.clearCookie('Authorization', { httpOnly: true });
+        response.status(200).json({});
     }
 
     private reset = async (request: express.Request, response: express.Response, next: NextFunction) => {

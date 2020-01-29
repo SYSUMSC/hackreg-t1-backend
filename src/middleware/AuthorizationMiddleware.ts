@@ -16,14 +16,14 @@ function getAuthMiddleware(publicKey: Buffer) {
                 const token = jwt.verify(cookies.Authorization, publicKey, { algorithms: ['RS256'] }) as IUserToken;
                 UserModel.findById(token._id).then((user) => {
                     if (!user) {
-                        next(createHttpError(422, '无法识别身份信息'));
+                        next(createHttpError(422, '无法识别身份信息或身份信息已过期，请重新登录'));
                     } else {
                         request.user = user;
                         next();
                     }
                 }).catch(next);
             } catch (e) {
-                next(createHttpError(422, '无法识别身份信息'));
+                next(createHttpError(422, '无法识别身份信息或身份信息已过期，请重新登录'));
             }
         }
     };

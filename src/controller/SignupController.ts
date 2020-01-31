@@ -22,7 +22,6 @@ class SignupController implements IController {
     private initRoutes() {
         this.router.get(`${this.path}/fetch`, getAuthMiddleware(this.publicKey), withUnhandledErrorBackup(this.fetch));
         this.router.post(`${this.path}/update`, getAuthMiddleware(this.publicKey), getValidationMiddleware(FormUpdateDto), withUnhandledErrorBackup(this.update));
-        this.router.post(`${this.path}/confirm`, getAuthMiddleware(this.publicKey), withUnhandledErrorBackup(this.confirm));
         this.router.post(`${this.path}/cancel`, getAuthMiddleware(this.publicKey), withUnhandledErrorBackup(this.cancel));
     }
 
@@ -41,12 +40,6 @@ class SignupController implements IController {
             await UserModel.findByIdAndUpdate(user._id, update);
             response.status(200).json({});
         }
-    }
-
-    private confirm = async (request: express.Request, response: express.Response, next: NextFunction) => {
-        const user = (request as express.Request & { user: IUser & mongoose.Document }).user;
-        await UserModel.findByIdAndUpdate(user._id, { confirmed: true });
-        response.status(200).json({});
     }
 
     private cancel = async (request: express.Request, response: express.Response, next: NextFunction) => {

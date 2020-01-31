@@ -1,20 +1,18 @@
 import { Type } from 'class-transformer';
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsEmail, IsInstance, IsString, Length, Validate, ValidateNested } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsInstance, Validate, ValidateNested } from 'class-validator';
 import 'reflect-metadata';
 import CaptainUniquenessValidator from './CaptainUniquenessValidator';
 import MemberInfoDto from './MemberInfoDto';
+import TeamInfoDto from './TeamInfoDto';
 
 class FormInfoDto {
-    @IsString()
-    @Length(1, 20)
-    public teamName!: string;
-
-    @IsString()
-    @Length(1, 50)
-    public teamDescription!: string;
+    @IsInstance(TeamInfoDto)
+    @Type(() => TeamInfoDto)
+    @ValidateNested()
+    public teamInfo!: TeamInfoDto;
 
     @IsArray()
-    @ArrayMinSize(2)
+    @ArrayMinSize(1)
     @ArrayMaxSize(6)
     @IsInstance(MemberInfoDto, { each: true })
     @Type(() => MemberInfoDto)

@@ -69,7 +69,7 @@ class App {
         this.controllers.forEach((controller) => {
             this.app.use('/', controller.router);
         });
-        this.app.all(`*`, (request, _, next) => {
+        this.app.all('*', (request, _, next) => {
             if (!request.route) {
                 next(createHttpError(400, '请求的方法或路径无效'));
             }
@@ -81,7 +81,7 @@ class App {
     }
 
     public async init() {
-        logger.info('Connecting database');
+        logger.info('Connecting to database');
         await mongoose.connect(this.config.mongodb, MONGO_OPTIONS);
         mongoose.connection.on('error', logger.error.bind(logger));
 

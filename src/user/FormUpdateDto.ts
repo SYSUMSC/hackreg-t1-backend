@@ -5,7 +5,7 @@ import FormInfoDto from './FormInfoDto';
 
 class FormUpdateDto {
     @IsBoolean()
-    public confirmed!: string;
+    public confirmed!: boolean;
 
     @ValidateNested()
     @Type(() => FormInfoDto)

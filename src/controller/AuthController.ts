@@ -60,8 +60,10 @@ class AuthController implements IController {
                 password: hash,
                 confirmed: false,
                 form: {
-                    teamName: '',
-                    teamDescription: '',
+                    teamInfo: {
+                        name: '',
+                        description: '',
+                    },
                     memberInfo: [],
                 },
             });

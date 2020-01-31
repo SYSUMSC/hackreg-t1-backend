@@ -4,21 +4,25 @@ import IUser from './IUser';
 
 const memberInfoSchema = new mongoose.Schema({
     name: String,
-    gender: Number,
+    gender: String,
     captain: Boolean,
     email: String,
     phone: String,
-    size: Number,
+    size: String,
     school: String,
-    education: Number,
+    education: String,
     grade: String,
     profession: String,
     experience: String,
 });
 
+const teamInfoSchema = new mongoose.Schema({
+    name: String,
+    description: String,
+});
+
 const signupFormSchema = new mongoose.Schema({
-    teamName: String,
-    teamDescription: String,
+    teamInfo: teamInfoSchema,
     memberInfo: [memberInfoSchema],
 });
 
@@ -31,6 +35,7 @@ const userSchema = new mongoose.Schema({
 
 // mongooseHidden() will only hide items when calling document.toObject() or document.toJson()
 memberInfoSchema.plugin(mongooseHidden(), { hidden: { _id: true } });
+teamInfoSchema.plugin(mongooseHidden(), { hidden: { _id: true } });
 signupFormSchema.plugin(mongooseHidden(), { hidden: { _id: true } });
 userSchema.plugin(mongooseHidden(), { hidden: { _id: true } });
 

@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmail, IsNumber, IsString, Length, Matches, Max, Min } from 'class-validator';
+import { IsBoolean, IsEmail, IsNumber, IsNumberString, IsString, Length, Matches, Max, Min } from 'class-validator';
 
 // Match all phone numbers from China mainland(exclude lot numbers) and HKSAR
 // Reference: https://www.hkepc.com/forum/viewthread.php?fid=26&tid=2190792 & https://github.com/VincentSit/ChinaMobilePhoneNumberRegex
@@ -6,13 +6,12 @@ const phoneRegex = /^1[0-9]{10}$|^[569][0-9]{7}$|^(?:\+?86)?1(?:3\d{3}|5[^4\D]\d
 
 class MemberInfoDto {
     @IsString()
-    @Length(1, 12)
+    @Length(1, 20)
     public name!: string;
 
-    @IsNumber()
-    @Min(0)
-    @Max(2)
-    public gender!: number;
+    @IsNumberString()
+    @Matches(/^[0-2]$/)
+    public gender!: string;
 
     @IsBoolean()
     public captain!: boolean;
@@ -26,19 +25,17 @@ class MemberInfoDto {
     @Matches(phoneRegex)
     public phone!: string;
 
-    @IsNumber()
-    @Min(0)
-    @Max(6)
-    public size!: number;
+    @IsNumberString()
+    @Matches(/^[0-6]$/)
+    public size!: string;
 
     @IsString()
     @Length(1, 15)
     public school!: string;
 
-    @IsNumber()
-    @Min(0)
-    @Max(2)
-    public education!: number;
+    @IsNumberString()
+    @Matches(/^[0-2]$/)
+    public education!: string;
 
     @IsString()
     @Length(1, 10)

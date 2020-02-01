@@ -96,10 +96,10 @@ class AuthController implements IController {
         const dto = request.body as PasswordResetDto;
         const user = await UserModel.findOne({ email: dto.email });
         if (!user) {
-            response.status(200).json({}); // TODO: shouldn't we send an error?
+            response.status(400).json({ message: '该邮箱对应的账户不存在' });
         } else {
             await UserPasswordResetModel.findOneAndDelete({ id: user._id });
-            const token = crypto.randomBytes(32).toString('hex');
+            const token = crypto.randomBytes(32).toString('hex'); // TODO: is it safe enough?
             const hash = await bcrypt.hash(token, 10);
             await UserPasswordResetModel.create({
                 id: user._id,
@@ -115,13 +115,13 @@ class AuthController implements IController {
         const dto = request.body as PasswordResetConfirmDto;
         const user = await UserModel.findOne({ email: dto.email });
         if (!user) {
-            next(createHttpError(400, '重制密码操作无效或已过期')); // TODO: should we improve it?
+            next(createHttpError(400, '验证码无效或已过期，重置密码操作无效')); // TODO: should we improve it?
         } else {
             const reset = await UserPasswordResetModel.findOne({ id: user._id });
             const matched = reset ? await bcrypt.compare(dto.token, reset.token) : false;
             const outdated = reset ? moment(reset.expire).isBefore(moment().utc()) : true;
             if (!reset || !matched || outdated) {
-                next(createHttpError(400, '重制密码操作无效或已过期'));
+                next(createHttpError(400, '验证码无效或已过期，重置密码操作无效'));
             } else {
                 const hash = await bcrypt.hash(dto.password, 10);
                 await UserModel.findByIdAndUpdate(reset.id, { password: hash });

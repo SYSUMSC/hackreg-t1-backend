@@ -2,6 +2,7 @@
 🤟The backend program for Hackathon 2020 registration website.
 
 ## Technology Stack
+- PM2
 - Mongodb
 - Express.js
 - TypeScript

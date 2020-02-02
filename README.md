@@ -6,8 +6,6 @@
 - Express.js
 - TypeScript
 
----
-
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and tell you how to deploy the project on a live system.
@@ -32,12 +30,8 @@ These instructions will get you a copy of the project up and running on your loc
 4. Run `npm install -g pm2` to install pm2 globally.
 5. Run `pm2 start app.config.js` to fire up the server!
 
----
-
 ## Documention
 Check out the wiki [here](https://github.com/SYSUMSC/hackreg-t1-backend/wiki/).
-
----
 
 ## License
 This project is licensed under the [MIT license](https://opensource.org/licenses/mit-license.php), see the LICENSE file for details

@@ -1,16 +1,43 @@
-WIP
+# Hackreg-t1-backend
+🤟The backend program for Hackathon 2020 registration website.
 
-Steps to build dev environment:
-1. `git clone https://github.com/SYSUMSC/hackreg-t1-backend.git`
-2. `cd hackreg-t1-backend`
-3. `npm install`
-4. Refer to `env/development.env` to prepare the public/private key pair
-5. Prepare your own mongodb server, edit related settings in `env/development.env`
+## Technology Stack
+- Mongodb
+- Express.js
+- TypeScript
 
-Command to run in dev environment:
+---
 
-`npm run dev`
+## Getting Started
 
-Command to build production codes:
+These instructions will get you a copy of the project up and running on your local machine for development and tell you how to deploy the project on a live system.
 
-`npm run build`
+#### Setting up local development environment
+1. Run these codes to fetch the copy of the project and install the dependent packages using npm.
+    ```
+    git clone https://github.com/SYSUMSC/hackreg-t1-backend.git
+    cd hackreg-t1-backend
+    npm install
+    ```
+2. Open `env/development.env`, and refer to the comments to set up mongodb and RSA SHA256 key pair.
+3. Run these codes to fire up the development build! Tips: With the help of nodemon, a recompile will automatically be executed whenever there are file changes in `src/` and `env/`.
+    ```
+    npm run dev
+    ```
+
+#### Making a production build and run it
+1. Run `npm run build`.
+2. Copy the `dist/` to wherever you want.
+3. Prepare a new RSA SHA256 key pair and edit `env/production.env` accordingly.
+4. Run `npm install -g pm2` to install pm2 globally.
+5. Run `pm2 start app.config.js` to fire up the server!
+
+---
+
+## Documention
+Check out the wiki [here](https://github.com/SYSUMSC/hackreg-t1-backend/wiki/).
+
+---
+
+## License
+This project is licensed under the [MIT license](https://opensource.org/licenses/mit-license.php), see the LICENSE file for details

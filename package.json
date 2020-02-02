@@ -1,9 +1,8 @@
 {
   "name": "hackreg-t1-backend",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@types/express-fileupload": "^1.1.0",
     "bcrypt": "^3.0.7",
     "body-parser": "^1.19.0",
     "class-transformer": "^0.2.3",
@@ -23,10 +22,11 @@
     "mongoose-hidden": "^1.8.1",
     "morgan": "^1.9.1",
     "nodemailer": "^6.4.2",
-    "rate-limiter-flexible": "^1.3.1",
-    "winston": "^3.2.1"
+    "pm2": "^4.2.3",
+    "rate-limiter-flexible": "^1.3.1"
   },
   "devDependencies": {
+    "@types/express-fileupload": "^1.1.0",
     "@types/bcrypt": "^3.0.0",
     "@types/command-line-args": "^5.0.0",
     "@types/cookie-parser": "^1.4.2",

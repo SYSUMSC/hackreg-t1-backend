@@ -20,7 +20,6 @@ if (error) {
     throw error;
 }
 cleanEnv(process.env, {
-    // TODO: add 'test' later
     NODE_ENV: str({ choices: ['development', 'production'] }),
     TRUST_PROXY: str(),
     HOST: host(),
@@ -29,6 +28,14 @@ cleanEnv(process.env, {
     PUBKEY: str(),
     PRIKEY: str(),
     PASSWORD_RESET_MAIL_DURATION: minute(),
+    LOGIN_LIMITER_BY_EMAIL_AND_IP_POINT: num(),
+    LOGIN_LIMITER_BY_EMAIL_AND_IP_DURATION: num(),
+    LOGIN_LIMITER_BY_IP_POINT: num(),
+    LOGIN_LIMITER_BY_IP_DURATION: num(),
+    AUTH_RELATED_LIMITER_BY_EMAIL_AND_IP_POINT: num(),
+    AUTH_RELATED_LIMITER_BY_EMAIL_AND_IP_DURATION: num(),
+    SIGNUP_RELATED_LIMITER_BY_EMAIL_AND_IP_POINT: num(),
+    SIGNUP_RELATED_LIMITER_BY_EMAIL_AND_IP_DURATION: num(),
     SMTP_HOST: str(),
     SMTP_PORT: port(),
     SMTP_SECURE: bool(),
@@ -46,8 +53,6 @@ const app = new App({
     host: process.env.HOST!,
     port: Number(process.env.PORT!),
     mongodb: process.env.MONGODB!,
-    publicKey,
-    privateKey,
     authControllerConfig: {
         privateKey,
         emailDuration: Number(process.env.PASSWORD_RESET_MAIL_DURATION!),
@@ -60,12 +65,24 @@ const app = new App({
                 pass: process.env.SMTP_PASS!,
             },
         },
+        emailTemplate: JSON.parse(readFileSync('./env/password_reset_mail_template.json').toString('UTF-8')),
+        loginLimiterByEmailAndIpPoints: Number(process.env.LOGIN_LIMITER_BY_EMAIL_AND_IP_POINT!),
+        loginLimiterByEmailAndIpDuration: Number(process.env.LOGIN_LIMITER_BY_EMAIL_AND_IP_DURATION!),
+        loginLimiterByIpPoints: Number(process.env.LOGIN_LIMITER_BY_IP_POINT!),
+        loginLimiterByIpDuration: Number(process.env.LOGIN_LIMITER_BY_IP_DURATION!),
+        authRelatedLimiterByEmailAndIpPoints: Number(process.env.AUTH_RELATED_LIMITER_BY_EMAIL_AND_IP_POINT!),
+        authRelatedLimiterByEmailAndIpDuration: Number(process.env.AUTH_RELATED_LIMITER_BY_EMAIL_AND_IP_DURATION!),
+    },
+    signupControllerConfig: {
+        publicKey,
+        limiterPoints: Number(process.env.SIGNUP_RELATED_LIMITER_BY_EMAIL_AND_IP_POINT!),
+        duration: Number(process.env.SIGNUP_RELATED_LIMITER_BY_EMAIL_AND_IP_DURATION!),
     },
     submitControllerConfig: {
         fileSizeLimit: Number(process.env.UPLOAD_FILE_SIZE_LIMIT!),
         tempDir: process.env.UPLOAD_TEMP_DIR!,
         dir: process.env.UPLOAD_DIR!,
         publicKey,
-    }
+    },
 });
 app.init();

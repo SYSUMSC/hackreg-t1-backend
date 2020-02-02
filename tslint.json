@@ -5,7 +5,9 @@
     "object-literal-sort-keys": false,
     "ordered-imports": true,
     "quotemark": [true, "single"],
-    "max-line-length": false
+    "max-line-length": false,
+    "no-console": false,
+    "no-unused-expression": false
   },
   "linterOptions": {
     "exclude": [

@@ -4,23 +4,22 @@ import express from 'express';
 import { Application } from 'express';
 import helmet from 'helmet';
 import createHttpError from 'http-errors';
+import moment from 'moment';
 import mongoose, { ConnectionOptions } from 'mongoose';
 import morgan from 'morgan';
 import AuthController, { IAuthControllerConfig } from './controller/AuthController';
 import IController from './controller/IController';
-import SignupController from './controller/SignupController';
+import SignupController, { ISignupControllerConfig } from './controller/SignupController';
 import SubmitController, { ISubmitControllerConfig } from './controller/SubmitController';
-import unhandledErrorsBackup from './middleware/UnhandledErrorsBackup';
-import { logger } from './shared/Logger';
+import unhandledErrorsBackup, { DATE_FORMAT } from './middleware/UnhandledErrorsBackup';
 
 interface IAppConfig {
     trustProxy: string;
     host: string;
     port: number;
     mongodb: string;
-    privateKey: Buffer;
-    publicKey: Buffer;
     authControllerConfig: IAuthControllerConfig;
+    signupControllerConfig: ISignupControllerConfig;
     submitControllerConfig: ISubmitControllerConfig;
 }
 
@@ -32,13 +31,7 @@ const MONGO_OPTIONS: ConnectionOptions = {
 };
 
 const JSON_OPTIONS: OptionsJson = {
-    limit: '1kb',
-};
-
-const URLENCODED_OPTIONS: OptionsUrlencoded = {
-    extended: true,
-    limit: '1kb', // TODO
-    parameterLimit: 20,
+    limit: '8kb',
 };
 
 class App {
@@ -50,7 +43,7 @@ class App {
         this.app = express();
         this.config = config;
         this.controllers = [
-            new SignupController(this.config.publicKey),
+            new SignupController(this.config.signupControllerConfig),
             new AuthController(this.config.authControllerConfig),
             new SubmitController(this.config.submitControllerConfig),
         ];
@@ -59,9 +52,8 @@ class App {
 
     private initMiddlewares() {
         this.app.use(morgan('combined'));
-        this.app.use(helmet({ noCache: true }));
+        this.app.use(helmet({ noCache: true, hidePoweredBy: true }));
         this.app.use(express.json(JSON_OPTIONS));
-        this.app.use(express.urlencoded(URLENCODED_OPTIONS));
         this.app.use(cookieParser());
     }
 
@@ -81,11 +73,14 @@ class App {
     }
 
     public async init() {
-        logger.info('Connecting to database');
+        console.info('Connecting to database');
         await mongoose.connect(this.config.mongodb, MONGO_OPTIONS);
-        mongoose.connection.on('error', logger.error.bind(logger));
+        mongoose.connection.on('error', (error) => {
+            console.error(`Database errored at ${moment().format(DATE_FORMAT)}`);
+            console.error(error);
+        });
 
-        logger.info('Initializing middlewares & controllers');
+        console.info('Initializing middlewares & controllers');
         this.initMiddlewares();
         this.initControllers();
         this.initErrorHandlers();
@@ -93,10 +88,10 @@ class App {
         await new Promise((resolve, reject) => {
             try {
                 if (this.config.host.startsWith('/')) {
-                    logger.info(`Server is now listening ${this.config.host}`);
+                    console.info(`Server is now running at ${this.config.host}`);
                     this.app.listen(this.config.host, () => resolve());
                 } else {
-                    logger.info(`Server is now listening ${this.config.host}:${this.config.port}`);
+                    console.info(`Server is now running at ${this.config.host}:${this.config.port}`);
                     this.app.listen(this.config.port, this.config.host, () => resolve());
                 }
             } catch (e) {
@@ -104,7 +99,7 @@ class App {
             }
         });
 
-        logger.info('Successfully launched the app!');
+        console.info('Successfully launched the app!');
     }
 }
 

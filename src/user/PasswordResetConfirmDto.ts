@@ -11,7 +11,8 @@ class PasswordResetConfirmDto {
     @Validate(CustomPasswordValidator)
     public password!: string;
 
-    @IsString() // TODO: should have a length limit
+    @IsString()
+    @Length(64, 64)
     public token!: string;
 }
 

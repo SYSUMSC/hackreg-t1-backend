@@ -3,4 +3,5 @@
 
 .DS_Store
 
-/keys
+/env/*.key
+/env/*.key.pub

@@ -1,5 +1,5 @@
 {
   "watch": ["src", "env"],
-  "ext": "ts,env",
-  "exec": "ts-node ./src --env=development"
+  "ext": "ts,env,json",
+  "exec": "ts-node ./src/AppBootstrap.ts --env=development"
 }

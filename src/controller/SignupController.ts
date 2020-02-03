@@ -1,9 +1,11 @@
 import express, { NextFunction } from 'express';
 import createHttpError from 'http-errors';
+import { Moment } from 'moment';
 import mongoose from 'mongoose';
 import { RateLimiterAbstract, RateLimiterCluster } from 'rate-limiter-flexible';
 import getAccessRateLimitingMiddleware from '../middleware/AccessRateLimitingMiddleware';
 import getAuthMiddleware from '../middleware/AuthorizationMiddleware';
+import getTimeAvailableCheckingMiddleware from '../middleware/TimeAvailableCheckingMiddleware';
 import { withUnhandledErrorBackup } from '../middleware/UnhandledErrorsBackup';
 import getValidationMiddleware from '../middleware/ValidationMiddleware';
 import FormUpdateDto from '../user/FormUpdateDto';
@@ -15,6 +17,8 @@ export interface ISignupControllerConfig {
     publicKey: Buffer;
     limiterPoints: number;
     duration: number;
+    startTime: Moment;
+    endTime: Moment;
 }
 
 class SignupController implements IController {
@@ -43,12 +47,14 @@ class SignupController implements IController {
                         withUnhandledErrorBackup(this.fetch));
 
         this.router.post(`${this.path}/update`,
+                         getTimeAvailableCheckingMiddleware(this.config.startTime, this.config.endTime, '报名尚未开始', '报名已经结束，不能再对报名表单做任何修改'),
                          getAuthMiddleware(this.config.publicKey),
                          this.accessRateLimitingMiddleware,
                          getValidationMiddleware(FormUpdateDto),
                          withUnhandledErrorBackup(this.update));
 
         this.router.post(`${this.path}/cancel`,
+                         getTimeAvailableCheckingMiddleware(this.config.startTime, this.config.endTime, '报名尚未开始', '报名已经结束，不能再对报名表单做任何修改'),
                          getAuthMiddleware(this.config.publicKey),
                          this.accessRateLimitingMiddleware,
                          withUnhandledErrorBackup(this.cancel));

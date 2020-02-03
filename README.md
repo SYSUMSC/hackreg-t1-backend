@@ -1,4 +1,4 @@
-# Hackreg-t1-backend
+# hackreg-t1-backend
 🤟The backend program for Hackathon 2020 registration website.
 
 ## Technology Stack
@@ -30,6 +30,7 @@ These instructions will get you a copy of the project up and running on your loc
 3. Prepare a new RSA SHA256 key pair and edit `env/production.env` accordingly.
 4. Run `npm install -g pm2` to install pm2 globally.
 5. Run `pm2 start app.config.js` to fire up the server!
+6. For deployment, it is strongly recommended to use a reverse proxy.
 
 ## Documention
 Check out the wiki [here](https://github.com/SYSUMSC/hackreg-t1-backend/wiki/).

@@ -168,7 +168,7 @@ class AuthController implements IController {
             await UserPasswordResetModel.create({
                 id: user._id,
                 token: hash,
-                expire: moment.utc().add(this.config.emailDuration, 'minutes').valueOf(),
+                expire: moment().add(this.config.emailDuration, 'minutes').valueOf(),
             });
             await this.transporter.sendMail({
                 from: this.config.emailTemplate.from.replace('${SMTP_USER}', this.config.smtpConfig.auth.user),
@@ -188,7 +188,7 @@ class AuthController implements IController {
         } else {
             const reset = await UserPasswordResetModel.findOne({ id: user._id });
             const matched = reset ? await bcrypt.compare(dto.token, reset.token) : false;
-            const outdated = reset ? moment(reset.expire).isBefore(moment().utc()) : true;
+            const outdated = reset ? moment(reset.expire).isBefore(moment()) : true;
             if (!reset || !matched || outdated) {
                 next(createHttpError(400, '验证码无效或已过期，重置密码操作无效'));
             } else {

@@ -4,6 +4,7 @@ import { bool, cleanEnv, host, num, port, str } from 'envalid';
 import { readFileSync } from 'fs-extra';
 import App from './App';
 import { exsistingDir, minute } from './shared/CustomEnvValidator';
+import moment from 'moment';
 
 const options = commandLineArgs([
     {
@@ -36,6 +37,10 @@ cleanEnv(process.env, {
     AUTH_RELATED_LIMITER_BY_EMAIL_AND_IP_DURATION: num(),
     SIGNUP_RELATED_LIMITER_BY_EMAIL_AND_IP_POINT: num(),
     SIGNUP_RELATED_LIMITER_BY_EMAIL_AND_IP_DURATION: num(),
+    SIGNUP_START_TIME: str(),
+    SIGNUP_END_TIME: str(),
+    SUBMIT_START_TIME: str(),
+    SUBMIT_END_TIME: str(),
     SMTP_HOST: str(),
     SMTP_PORT: port(),
     SMTP_SECURE: bool(),
@@ -77,12 +82,16 @@ const app = new App({
         publicKey,
         limiterPoints: Number(process.env.SIGNUP_RELATED_LIMITER_BY_EMAIL_AND_IP_POINT!),
         duration: Number(process.env.SIGNUP_RELATED_LIMITER_BY_EMAIL_AND_IP_DURATION!),
+        startTime: moment(process.env.SIGNUP_START_TIME!),
+        endTime: moment(process.env.SIGNUP_END_TIME!),
     },
     submitControllerConfig: {
         fileSizeLimit: Number(process.env.UPLOAD_FILE_SIZE_LIMIT!),
         tempDir: process.env.UPLOAD_TEMP_DIR!,
         dir: process.env.UPLOAD_DIR!,
         publicKey,
+        startTime: moment(process.env.SUBMIT_START_TIME!),
+        endTime: moment(process.env.SUBMIT_END_TIME!),
     },
 });
 app.init();

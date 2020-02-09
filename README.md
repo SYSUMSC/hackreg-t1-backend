@@ -7,9 +7,7 @@
 - Express.js
 - TypeScript
 
-## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and tell you how to deploy the project on a live system.
+## Guides
 
 #### Setting up local development environment
 1. Run these commands to fetch the copy of the project and install the dependent packages using npm.
@@ -31,7 +29,11 @@ These instructions will get you a copy of the project up and running on your loc
 3. Prepare a new RSA SHA256 key pair and edit `env/production.env` accordingly.
 4. Run `npm install -g pm2` to install pm2 globally.
 5. Run `pm2 start app.config.js` to fire up the server!
-6. For deployment, it is strongly recommended to use a reverse proxy.
+
+#### Deployment
+1. Prepare a good mongodb server and a reverse proxy.
+2. Edit `env/production.env` according to your actual environment.
+3. Follow the guides above.
 
 ## Documention
 Check out the wiki [here](https://github.com/SYSUMSC/hackreg-t1-backend/wiki/).

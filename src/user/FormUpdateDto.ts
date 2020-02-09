@@ -4,12 +4,12 @@ import 'reflect-metadata';
 import FormInfoDto from './FormInfoDto';
 
 class FormUpdateDto {
-    @IsBoolean()
-    public confirmed!: boolean;
+  @IsBoolean()
+  public confirmed!: boolean;
 
-    @ValidateNested()
-    @Type(() => FormInfoDto)
-    public form!: FormInfoDto;
+  @ValidateNested()
+  @Type(() => FormInfoDto)
+  public form!: FormInfoDto;
 }
 
 export default FormUpdateDto;

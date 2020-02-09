@@ -7,57 +7,70 @@ import nodePath from 'path';
 import getAuthMiddleware from '../middleware/AuthorizationMiddleware';
 import getTimeAvailableCheckingMiddleware from '../middleware/TimeAvailableCheckingMiddleware';
 import { withUnhandledErrorBackup } from '../middleware/UnhandledErrorsBackup';
-import IUser from '../user/IUser';
-import IController from './IController';
+import User from '../user/User';
+import Controller from './Controller';
 
-export interface ISubmitControllerConfig {
-    fileSizeLimit: number;
-    tempDir: string;
-    dir: string;
-    publicKey: Buffer;
-    startTime: Moment;
-    endTime: Moment;
+export interface SubmitControllerConfig {
+  fileSizeLimit: number;
+  tempDir: string;
+  dir: string;
+  publicKey: Buffer;
+  startTime: Moment;
+  endTime: Moment;
 }
 
-class SubmitController implements IController {
-    public readonly router = express.Router();
-    private readonly path = '/submit';
-    private readonly config: ISubmitControllerConfig;
+class SubmitController implements Controller {
+  public readonly router = express.Router();
+  private readonly path = '/submit';
+  private readonly config: SubmitControllerConfig;
 
-    constructor(config: ISubmitControllerConfig) {
-        this.config = config;
-        this.initRoutes();
-    }
+  constructor(config: SubmitControllerConfig) {
+    this.config = config;
+    this.initRoutes();
+  }
 
-    private initRoutes() {
-        const fileUploadMiddleware = fileUpload({
-            limits: { fileSize: this.config.fileSizeLimit * 1024 * 1024 },
-            useTempFiles: true,
-            tempFileDir: this.config.tempDir,
-            safeFileNames: true,
-            abortOnLimit: true,
-            limitHandler: (req: express.Request, res: express.Response, next: NextFunction) => {
-                next(createHttpError(400, '文件大小超过上限'));
-            },
-        });
-        this.router.post(this.path,
-                         getTimeAvailableCheckingMiddleware(this.config.startTime, this.config.endTime, '作品提交尚未开始', '作品提交已经截止'),
-                         getAuthMiddleware(this.config.publicKey),
-                         fileUploadMiddleware,
-                         withUnhandledErrorBackup(this.submit));
-    }
+  private initRoutes() {
+    const fileUploadMiddleware = fileUpload({
+      limits: { fileSize: this.config.fileSizeLimit * 1024 * 1024 },
+      useTempFiles: true,
+      tempFileDir: this.config.tempDir,
+      safeFileNames: true,
+      abortOnLimit: true,
+      limitHandler: (req: express.Request, res: express.Response, next: NextFunction) => {
+        next(createHttpError(400, '文件大小超过上限'));
+      }
+    });
+    this.router.post(
+      this.path,
+      getTimeAvailableCheckingMiddleware(
+        this.config.startTime,
+        this.config.endTime,
+        '作品提交尚未开始',
+        '作品提交已经截止'
+      ),
+      getAuthMiddleware(this.config.publicKey),
+      fileUploadMiddleware,
+      withUnhandledErrorBackup(this.submit)
+    );
+  }
 
-    private submit = async (request: express.Request, response: express.Response, next: NextFunction) => {
-        const file = request?.files?.work;
-        if (!file || Array.isArray(file)) {
-            next(createHttpError(400, '请求无效'));
-        } else {
-            const user = (request as express.Request & { user: IUser & mongoose.Document }).user;
-            const uploadedFile = file as UploadedFile;
-            await uploadedFile.mv(nodePath.join(this.config.dir, user._id, 'work.zip'));
-            response.status(204).send();
-        }
+  private submit = async (
+    request: express.Request,
+    response: express.Response,
+    next: NextFunction
+  ) => {
+    const file = request?.files?.work;
+    if (!file || Array.isArray(file)) {
+      next(createHttpError(400, '请求无效'));
+    } else {
+      const user = (request as express.Request & {
+        user: User & mongoose.Document;
+      }).user;
+      const uploadedFile = file as UploadedFile;
+      await uploadedFile.mv(nodePath.join(this.config.dir, user._id, 'work.zip'));
+      response.status(204).send();
     }
+  };
 }
 
 export default SubmitController;

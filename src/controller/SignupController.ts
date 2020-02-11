@@ -64,19 +64,6 @@ class SignupController implements Controller {
       getValidationMiddleware(FormUpdateDto),
       withUnhandledErrorBackup(this.update)
     );
-
-    this.router.post(
-      `${this.path}/cancel`,
-      getTimeAvailableCheckingMiddleware(
-        this.config.startTime,
-        this.config.endTime,
-        '报名尚未开始',
-        '报名已经结束，不能再对报名表单做任何修改'
-      ),
-      getAuthMiddleware(this.config.publicKey),
-      this.accessRateLimitingMiddleware,
-      withUnhandledErrorBackup(this.cancel)
-    );
   }
 
   private fetch = async (
@@ -100,23 +87,7 @@ class SignupController implements Controller {
       user: User & mongoose.Document;
     }).user;
     const update = request.body as FormUpdateDto;
-    if (user.confirmed) {
-      next(createHttpError(403, '报名信息已经被确认且不能再修改'));
-    } else {
-      await UserModel.findByIdAndUpdate(user._id, update);
-      response.status(204).send();
-    }
-  };
-
-  private cancel = async (
-    request: express.Request,
-    response: express.Response,
-    next: NextFunction
-  ) => {
-    const user = (request as express.Request & {
-      user: User & mongoose.Document;
-    }).user;
-    await UserModel.findByIdAndUpdate(user._id, { confirmed: false });
+    await UserModel.findByIdAndUpdate(user._id, update);
     response.status(204).send();
   };
 }

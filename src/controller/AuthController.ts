@@ -16,6 +16,7 @@ import UserModel from '../user/UserModel';
 import UserPasswordResetModel from '../user/UserPasswordResetModel';
 import UserRegAndLoginDto from '../user/UserRegAndLoginDto';
 import Controller from './Controller';
+import { email } from 'envalid';
 
 export interface AuthControllerConfig {
   privateKey: Buffer;
@@ -142,7 +143,7 @@ class AuthController implements Controller {
       response.cookie('Authorization', token, {
         maxAge: 43200000,
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === 'production'
       });
       response.status(204).send();
     }
@@ -178,7 +179,8 @@ class AuthController implements Controller {
       });
       response.cookie('Authorization', token, {
         maxAge: 43200000,
-        httpOnly: true
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production'
       });
       response.status(204).send();
     }
@@ -189,7 +191,10 @@ class AuthController implements Controller {
     response: express.Response,
     _next: NextFunction
   ) => {
-    response.clearCookie('Authorization', { httpOnly: true, secure: true });
+    response.clearCookie('Authorization', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production'
+    });
     response.status(204).send();
   };
 
@@ -220,7 +225,9 @@ class AuthController implements Controller {
         ),
         to: dto.email,
         subject: this.config.emailTemplate.subject,
-        html: this.config.emailTemplate.html.replace('${TOKEN}', token)
+        html: this.config.emailTemplate.html
+          .replace('${TOKEN}', token)
+          .replace('${EMAIL}', dto.email)
       });
       response.status(204).send();
     }

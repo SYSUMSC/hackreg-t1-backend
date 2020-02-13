@@ -51,7 +51,12 @@ class App {
   }
 
   private initMiddlewares() {
-    this.app.use(morgan('combined'));
+    morgan.token('date_', () => moment().format());
+    morgan.format(
+      'hackreg',
+      ':remote-addr [:date_] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'
+    );
+    this.app.use(morgan('hackreg'));
     this.app.use(helmet({ noCache: true, hidePoweredBy: true }));
     this.app.use(express.json(JSON_OPTIONS));
     this.app.use(cookieParser());

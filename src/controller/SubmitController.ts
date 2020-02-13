@@ -9,6 +9,7 @@ import getTimeAvailableCheckingMiddleware from '../middleware/TimeAvailableCheck
 import { withUnhandledErrorBackup } from '../middleware/UnhandledErrorsBackup';
 import User from '../user/User';
 import Controller from './Controller';
+import { pathExists, rmdir, mkdir } from 'fs-extra';
 
 export interface SubmitControllerConfig {
   fileSizeLimit: number;
@@ -67,7 +68,12 @@ class SubmitController implements Controller {
         user: User & mongoose.Document;
       }).user;
       const uploadedFile = file as UploadedFile;
-      await uploadedFile.mv(nodePath.join(this.config.dir, user._id, 'work.zip'));
+      const path = nodePath.join(this.config.dir, String(user._id));
+      if (await pathExists(path)) {
+        await rmdir(path);
+      }
+      await mkdir(path);
+      await uploadedFile.mv(nodePath.join(path, 'work.zip'));
       response.status(204).send();
     }
   };

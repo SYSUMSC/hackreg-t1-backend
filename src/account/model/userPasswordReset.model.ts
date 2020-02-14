@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import UserPasswordResetToken from './UserPasswordResetToken';
+import UserPasswordResetToken from '../type/userPasswordResetToken';
 
 const userPasswordResetSchema = new mongoose.Schema({
   id: String,

@@ -1,14 +1,14 @@
-import express, { NextFunction } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
 import fileUpload, { UploadedFile } from 'express-fileupload';
 import createHttpError from 'http-errors';
 import { Moment } from 'moment';
 import mongoose from 'mongoose';
 import nodePath from 'path';
-import getAuthMiddleware from '../middleware/AuthorizationMiddleware';
-import getTimeAvailableCheckingMiddleware from '../middleware/TimeAvailableCheckingMiddleware';
-import { withUnhandledErrorBackup } from '../middleware/UnhandledErrorsBackup';
-import User from '../user/User';
-import Controller from './Controller';
+import getAuthMiddleware from '../middleware/auth.middleware';
+import getTimeAvailableCheckingMiddleware from '../middleware/timeCheck.middleware';
+import { withUnhandledErrorBackup } from '../middleware/unhandledErrors.middleware';
+import User from '../account/type/user';
+import Controller from './base.controller';
 import { pathExists, rmdir, mkdir } from 'fs-extra';
 
 export interface SubmitControllerConfig {
@@ -21,7 +21,7 @@ export interface SubmitControllerConfig {
 }
 
 class SubmitController implements Controller {
-  public readonly router = express.Router();
+  public readonly router = Router();
   private readonly path = '/submit';
   private readonly config: SubmitControllerConfig;
 
@@ -37,7 +37,7 @@ class SubmitController implements Controller {
       tempFileDir: this.config.tempDir,
       safeFileNames: true,
       abortOnLimit: true,
-      limitHandler: (req: express.Request, res: express.Response, next: NextFunction) => {
+      limitHandler: (req: Request, res: Response, next: NextFunction) => {
         next(createHttpError(400, '文件大小超过上限'));
       }
     });
@@ -55,16 +55,12 @@ class SubmitController implements Controller {
     );
   }
 
-  private submit = async (
-    request: express.Request,
-    response: express.Response,
-    next: NextFunction
-  ) => {
+  private submit = async (request: Request, response: Response, next: NextFunction) => {
     const file = request?.files?.work;
     if (!file || Array.isArray(file)) {
       next(createHttpError(400, '请求无效'));
     } else {
-      const user = (request as express.Request & {
+      const user = (request as Request & {
         user: User & mongoose.Document;
       }).user;
       const uploadedFile = file as UploadedFile;

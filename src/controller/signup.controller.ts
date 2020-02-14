@@ -1,17 +1,17 @@
-import express, { NextFunction } from 'express';
+import { NextFunction, Request, Response, Router, RequestHandler } from 'express';
 import createHttpError from 'http-errors';
 import { Moment } from 'moment';
 import mongoose from 'mongoose';
 import { RateLimiterAbstract, RateLimiterCluster } from 'rate-limiter-flexible';
-import getAccessRateLimitingMiddleware from '../middleware/AccessRateLimitingMiddleware';
-import getAuthMiddleware from '../middleware/AuthorizationMiddleware';
-import getTimeAvailableCheckingMiddleware from '../middleware/TimeAvailableCheckingMiddleware';
-import { withUnhandledErrorBackup } from '../middleware/UnhandledErrorsBackup';
-import getValidationMiddleware from '../middleware/ValidationMiddleware';
-import FormUpdateDto from '../user/FormUpdateDto';
-import User from '../user/User';
-import UserModel from '../user/UserModel';
-import Controller from './Controller';
+import getAccessRateLimitingMiddleware from '../middleware/accessRateLimit.middleware';
+import getAuthMiddleware from '../middleware/auth.middleware';
+import getTimeAvailableCheckingMiddleware from '../middleware/timeCheck.middleware';
+import { withUnhandledErrorBackup } from '../middleware/unhandledErrors.middleware';
+import getValidationMiddleware from '../middleware/validation.middleware';
+import FormUpdateDto from '../account/dto/formUpdate.dto';
+import User from '../account/type/user';
+import UserModel from '../account/model/user.model';
+import Controller from './base.controller';
 
 export interface SignupControllerConfig {
   publicKey: Buffer;
@@ -22,11 +22,11 @@ export interface SignupControllerConfig {
 }
 
 class SignupController implements Controller {
-  public readonly router = express.Router();
+  public readonly router = Router();
   private readonly path = '/signup';
   private readonly config: SignupControllerConfig;
   private readonly signupRelatedLimiterByEmailAndIp: RateLimiterAbstract;
-  private readonly accessRateLimitingMiddleware: express.RequestHandler;
+  private readonly accessRateLimitingMiddleware: RequestHandler;
 
   constructor(config: SignupControllerConfig) {
     this.config = config;
@@ -38,7 +38,7 @@ class SignupController implements Controller {
     });
     this.accessRateLimitingMiddleware = getAccessRateLimitingMiddleware(
       this.signupRelatedLimiterByEmailAndIp,
-      req => (req as express.Request & { user: User & mongoose.Document }).user.email
+      req => (req as Request & { user: User & mongoose.Document }).user.email
     );
     this.initRoutes();
   }
@@ -66,24 +66,16 @@ class SignupController implements Controller {
     );
   }
 
-  private fetch = async (
-    request: express.Request,
-    response: express.Response,
-    next: NextFunction
-  ) => {
-    const user = (request as express.Request & {
+  private fetch = async (request: Request, response: Response, next: NextFunction) => {
+    const user = (request as Request & {
       user: User & mongoose.Document;
     }).user;
     const userObj = user.toObject({ flattenMaps: true, versionKey: false });
     response.status(200).json(userObj);
   };
 
-  private update = async (
-    request: express.Request,
-    response: express.Response,
-    next: NextFunction
-  ) => {
-    const user = (request as express.Request & {
+  private update = async (request: Request, response: Response, next: NextFunction) => {
+    const user = (request as Request & {
       user: User & mongoose.Document;
     }).user;
     const update = request.body as FormUpdateDto;

@@ -1,15 +1,15 @@
-import express, { NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import createHttpError from 'http-errors';
 import * as jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
-import User from '../user/User';
-import UserToken from '../user/UserToken';
-import UserModel from '../user/UserModel';
+import User from '../account/type/user';
+import UserToken from '../account/type/userToken';
+import UserModel from '../account/model/user.model';
 
 function getAuthMiddleware(publicKey: Buffer) {
   return function authorizationMiddleware(
-    request: express.Request & { user?: User & mongoose.Document },
-    response: express.Response,
+    request: Request & { user?: User & mongoose.Document },
+    response: Response,
     next: NextFunction
   ) {
     const cookies = request.cookies;

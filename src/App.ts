@@ -1,17 +1,17 @@
 import { OptionsJson } from 'body-parser';
 import cookieParser from 'cookie-parser';
-import express from 'express';
+import express, { json } from 'express';
 import { Application } from 'express';
 import helmet from 'helmet';
 import createHttpError from 'http-errors';
 import moment from 'moment';
 import mongoose, { ConnectionOptions } from 'mongoose';
 import morgan from 'morgan';
-import AuthController, { AuthControllerConfig } from './controller/AuthController';
-import Controller from './controller/Controller';
-import SignupController, { SignupControllerConfig } from './controller/SignupController';
-import SubmitController, { SubmitControllerConfig } from './controller/SubmitController';
-import unhandledErrorsBackup, { DATE_FORMAT } from './middleware/UnhandledErrorsBackup';
+import AuthController, { AuthControllerConfig } from './controller/auth.controller';
+import Controller from './controller/base.controller';
+import SignupController, { SignupControllerConfig } from './controller/signup.controller';
+import SubmitController, { SubmitControllerConfig } from './controller/submit.controller';
+import unhandledErrorsBackup, { DATE_FORMAT } from './middleware/unhandledErrors.middleware';
 
 interface AppConfig {
   trustProxy: string;
@@ -51,14 +51,14 @@ class App {
   }
 
   private initMiddlewares() {
-    morgan.token('date_', () => moment().format());
+    morgan.token('date_', () => moment().format(DATE_FORMAT));
     morgan.format(
       'hackreg',
       ':remote-addr [:date_] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'
     );
     this.app.use(morgan('hackreg'));
     this.app.use(helmet({ noCache: true, hidePoweredBy: true }));
-    this.app.use(express.json(JSON_OPTIONS));
+    this.app.use(json(JSON_OPTIONS));
     this.app.use(cookieParser());
   }
 

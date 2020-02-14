@@ -1,7 +1,7 @@
 import { plainToClass } from 'class-transformer';
 import { ClassType } from 'class-transformer/ClassTransformer';
 import { validate, ValidationError } from 'class-validator';
-import express from 'express';
+import { RequestHandler } from 'express';
 import createHttpError from 'http-errors';
 
 function getInvalidPropNames(errors: ValidationError[]): string[] {
@@ -24,7 +24,7 @@ function getInvalidPropNames(errors: ValidationError[]): string[] {
   return names;
 }
 
-function getValidationMiddleware<T extends object>(dtoType: ClassType<T>): express.RequestHandler {
+function getValidationMiddleware<T extends object>(dtoType: ClassType<T>): RequestHandler {
   return (request, _, next) => {
     validate(plainToClass(dtoType, request.body), { whitelist: true, forbidNonWhitelisted: true })
       .then(errors => {

@@ -3,7 +3,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface
 } from 'class-validator';
-import MemberInfoDto from './MemberInfoDto';
+import MemberInfoDto from '../dto/memberInfo.dto';
 
 @ValidatorConstraint({ name: 'captainUniqueness', async: false })
 class CaptainUniquenessValidator implements ValidatorConstraintInterface {

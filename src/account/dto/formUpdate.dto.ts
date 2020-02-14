@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer';
 import { IsBoolean, ValidateNested } from 'class-validator';
 import 'reflect-metadata';
-import FormInfoDto from './FormInfoDto';
+import FormInfoDto from './formInfo.dto';
 
 class FormUpdateDto {
   @IsBoolean()

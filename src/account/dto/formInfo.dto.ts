@@ -8,9 +8,9 @@ import {
   ValidateNested
 } from 'class-validator';
 import 'reflect-metadata';
-import CaptainUniquenessValidator from './CaptainUniquenessValidator';
-import MemberInfoDto from './MemberInfoDto';
-import TeamInfoDto from './TeamInfoDto';
+import CaptainUniquenessValidator from '../validator/captainUniqueness.validator';
+import MemberInfoDto from './memberInfo.dto';
+import TeamInfoDto from './teamInfo.dto';
 
 class FormInfoDto {
   @IsInstance(TeamInfoDto)

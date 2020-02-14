@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import mongooseHidden from 'mongoose-hidden';
-import User from './User';
+import User from '../type/user';
 
 const memberInfoSchema = new mongoose.Schema({
   name: String,

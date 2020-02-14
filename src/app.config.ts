@@ -3,13 +3,13 @@ module.exports = {
   apps: [
     {
       name: 'hackreg-t1-rate-limiter',
-      script: './RateLimiterApp.js',
+      script: './rateLimiter.js',
       instances: 1,
       autorestart: true
     },
     {
       name: 'hackreg-t1-worker',
-      script: './AppBootstrap.js',
+      script: './appBootstrap.js',
       instances: 0,
       // eslint-disable-next-line @typescript-eslint/camelcase
       exec_mode: 'cluster',

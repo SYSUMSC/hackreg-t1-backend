@@ -1,5 +1,5 @@
 import { IsEmail, IsString, Length, Validate } from 'class-validator';
-import CustomPasswordValidator from './CustomPasswordValidator';
+import CustomPasswordValidator from '../validator/custom.validator';
 
 class PasswordResetConfirmDto {
   @IsEmail()

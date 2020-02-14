@@ -1,4 +1,4 @@
-import express, { NextFunction } from 'express';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 import createHttpError from 'http-errors';
 import moment from 'moment';
 
@@ -6,8 +6,8 @@ export const DATE_FORMAT = 'MM/DD HH:mm:ss:SSS';
 
 function unhandledErrorsBackup(
   error: Error,
-  request: express.Request,
-  response: express.Response,
+  request: Request,
+  response: Response,
   next: NextFunction
 ) {
   if (!(error instanceof createHttpError.HttpError)) {
@@ -23,12 +23,8 @@ function unhandledErrorsBackup(
 }
 
 export function withUnhandledErrorBackup<T>(
-  routeHandler: (
-    request: express.Request,
-    response: express.Response,
-    next: NextFunction
-  ) => Promise<T>
-): express.RequestHandler {
+  routeHandler: (request: Request, response: Response, next: NextFunction) => Promise<T>
+): RequestHandler {
   return (request, response, next) => {
     routeHandler(request, response, next).catch(next);
   };

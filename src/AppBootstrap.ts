@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 import { bool, cleanEnv, host, num, port, str } from 'envalid';
 import { readFileSync, existsSync } from 'fs-extra';
-import App from './App';
-import { exsistingDir, minute } from './shared/CustomEnvValidator';
+import App from './app';
+import { exsistingDir, minute } from './shared/env.validator';
 import moment from 'moment';
 
 const env = `./env/${process.env.NODE_ENV === 'development' ? 'development' : 'production'}.env`;

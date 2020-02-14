@@ -1,4 +1,4 @@
-import express, { NextFunction } from 'express';
+import { NextFunction, Response, Request } from 'express';
 import createHttpError from 'http-errors';
 import moment, { Moment } from 'moment';
 
@@ -8,11 +8,7 @@ function getTimeAvailableCheckingMiddleware(
   startErrorMsg: string,
   endErrorMsg: string
 ) {
-  return function checkTime(
-    request: express.Request,
-    response: express.Response,
-    next: NextFunction
-  ) {
+  return function checkTime(request: Request, response: Response, next: NextFunction) {
     const now = moment();
     if (now.isBefore(start)) {
       next(createHttpError(403, startErrorMsg));

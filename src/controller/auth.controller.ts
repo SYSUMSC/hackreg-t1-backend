@@ -1,22 +1,21 @@
 import * as bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import express, { NextFunction } from 'express';
+import { Request, Response, NextFunction, RequestHandler, Router } from 'express';
 import createHttpError from 'http-errors';
 import * as jwt from 'jsonwebtoken';
 import moment from 'moment';
 import * as nodemailer from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 import { RateLimiterAbstract, RateLimiterCluster } from 'rate-limiter-flexible';
-import getAccessRateLimitingMiddleware from '../middleware/AccessRateLimitingMiddleware';
-import { withUnhandledErrorBackup } from '../middleware/UnhandledErrorsBackup';
-import getValidationMiddleware from '../middleware/ValidationMiddleware';
-import PasswordResetConfirmDto from '../user/PasswordResetConfirmDto';
-import PasswordResetDto from '../user/PasswordResetDto';
-import UserModel from '../user/UserModel';
-import UserPasswordResetModel from '../user/UserPasswordResetModel';
-import UserRegAndLoginDto from '../user/UserRegAndLoginDto';
-import Controller from './Controller';
-import { email } from 'envalid';
+import getAccessRateLimitingMiddleware from '../middleware/accessRateLimit.middleware';
+import { withUnhandledErrorBackup } from '../middleware/unhandledErrors.middleware';
+import getValidationMiddleware from '../middleware/validation.middleware';
+import PasswordResetConfirmDto from '../account/dto/passwordResetConfirm.dto';
+import PasswordResetDto from '../account/dto/passwordReset.dto';
+import UserModel from '../account/model/user.model';
+import UserPasswordResetModel from '../account/model/userPasswordReset.model';
+import UserRegAndLoginDto from '../account/dto/userRegAndLogin.dto';
+import Controller from './base.controller';
 
 export interface AuthControllerConfig {
   privateKey: Buffer;
@@ -45,14 +44,14 @@ export interface PasswordResetEmailTemplate {
 }
 
 class AuthController implements Controller {
-  public readonly router = express.Router();
+  public readonly router = Router();
   private readonly path = '/auth';
   private readonly config: AuthControllerConfig;
   private readonly transporter: Mail;
   private readonly loginLimiterByEmailAndIp: RateLimiterAbstract;
   private readonly loginLimiterByIp: RateLimiterAbstract;
   private readonly authRelatedLimiterByEmailAndIp: RateLimiterAbstract;
-  private readonly rateLimitingMiddleware: express.RequestHandler;
+  private readonly rateLimitingMiddleware: RequestHandler;
 
   constructor(config: AuthControllerConfig) {
     this.config = config;
@@ -113,11 +112,7 @@ class AuthController implements Controller {
     );
   }
 
-  private register = async (
-    request: express.Request,
-    response: express.Response,
-    next: NextFunction
-  ) => {
+  private register = async (request: Request, response: Response, next: NextFunction) => {
     const accountData = request.body as UserRegAndLoginDto;
     if (await UserModel.findOne({ email: accountData.email })) {
       next(createHttpError(409, '指定邮箱的账户已经存在'));
@@ -149,11 +144,7 @@ class AuthController implements Controller {
     }
   };
 
-  private login = async (
-    request: express.Request,
-    response: express.Response,
-    next: NextFunction
-  ) => {
+  private login = async (request: Request, response: Response, next: NextFunction) => {
     const accountData = request.body as UserRegAndLoginDto;
     const ip = request.ip;
     const emailIpKey = `${accountData.email}-${ip}`;
@@ -186,11 +177,7 @@ class AuthController implements Controller {
     }
   };
 
-  private logout = async (
-    _request: express.Request,
-    response: express.Response,
-    _next: NextFunction
-  ) => {
+  private logout = async (_request: Request, response: Response, _next: NextFunction) => {
     response.clearCookie('Authorization', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production'
@@ -198,11 +185,7 @@ class AuthController implements Controller {
     response.status(204).send();
   };
 
-  private reset = async (
-    request: express.Request,
-    response: express.Response,
-    _next: NextFunction
-  ) => {
+  private reset = async (request: Request, response: Response, _next: NextFunction) => {
     const dto = request.body as PasswordResetDto;
     const user = await UserModel.findOne({ email: dto.email });
     if (!user) {
@@ -233,11 +216,7 @@ class AuthController implements Controller {
     }
   };
 
-  private confirm = async (
-    request: express.Request,
-    response: express.Response,
-    next: NextFunction
-  ) => {
+  private confirm = async (request: Request, response: Response, next: NextFunction) => {
     const dto = request.body as PasswordResetConfirmDto;
     const user = await UserModel.findOne({ email: dto.email });
     if (!user) {

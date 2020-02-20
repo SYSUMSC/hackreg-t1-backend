@@ -9,7 +9,7 @@ import getTimeAvailableCheckingMiddleware from '../middleware/timeCheck.middlewa
 import { withUnhandledErrorBackup } from '../middleware/unhandledErrors.middleware';
 import User from '../account/type/user';
 import Controller from './base.controller';
-import { pathExists, rmdir, mkdir } from 'fs-extra';
+import { pathExists, mkdir, remove } from 'fs-extra';
 
 export interface SubmitControllerConfig {
   fileSizeLimit: number;
@@ -65,11 +65,13 @@ class SubmitController implements Controller {
       }).user;
       const uploadedFile = file as UploadedFile;
       const path = nodePath.join(this.config.dir, String(user._id));
+      const filePath = nodePath.join(path, 'work.zip');
       if (await pathExists(path)) {
-        await rmdir(path);
+        await remove(filePath);
+      } else {
+        await mkdir(path);
       }
-      await mkdir(path);
-      await uploadedFile.mv(nodePath.join(path, 'work.zip'));
+      await uploadedFile.mv(filePath);
       response.status(204).send();
     }
   };

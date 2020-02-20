@@ -64,9 +64,9 @@ class App {
 
   private initControllers() {
     this.controllers.forEach(controller => {
-      this.app.use('/', controller.router);
+      this.app.use('/backend', controller.router);
     });
-    this.app.all('*', (request, _, next) => {
+    this.app.all('/backend/*', (request, _, next) => {
       if (!request.route) {
         next(createHttpError(400, '请求的方法或路径无效'));
       }

@@ -92,9 +92,7 @@ const app = new App({
     endTime: moment(process.env.SUBMIT_END_TIME!)
   }
 });
-try {
-  app.init();
-} catch (error) {
+app.init().catch(err => {
   console.error('failed to initialize app!');
-  throw error;
-}
+  console.error(err);
+});
